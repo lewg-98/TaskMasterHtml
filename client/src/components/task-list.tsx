@@ -48,19 +48,23 @@ export function TaskList() {
   });
 
   if (isLoading) {
-    return <div className="text-muted-foreground">Loading tasks...</div>;
+    return <div className="text-muted-foreground animate-pulse">Loading tasks...</div>;
   }
 
   if (!tasks?.length) {
-    return <div className="text-muted-foreground">No tasks yet</div>;
+    return (
+      <div className="text-center py-8 text-muted-foreground">
+        No tasks yet. Add your first task above!
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {tasks.map((task) => (
         <div
           key={task.id}
-          className="flex items-center gap-3 group"
+          className="task-item flex items-center gap-3 p-3 group"
         >
           <Checkbox
             checked={task.completed}
@@ -68,18 +72,15 @@ export function TaskList() {
             onCheckedChange={(checked) =>
               toggleMutation.mutate({ id: task.id, completed: !!checked })
             }
+            className="transition-fast"
           />
-          <span
-            className={`flex-1 ${
-              task.completed ? "text-muted-foreground line-through" : ""
-            }`}
-          >
+          <span className={task.completed ? "task-completed" : "flex-1"}>
             {task.title}
           </span>
           <Button
             variant="ghost"
             size="icon"
-            className="opacity-0 group-hover:opacity-100 transition-opacity"
+            className="delete-button"
             disabled={deleteMutation.isPending}
             onClick={() => deleteMutation.mutate(task.id)}
           >

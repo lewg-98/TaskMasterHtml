@@ -10,7 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 export function TaskForm() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
+
   const form = useForm<InsertTask>({
     resolver: zodResolver(insertTaskSchema),
     defaultValues: {
@@ -49,7 +49,8 @@ export function TaskForm() {
             <FormItem className="flex-1">
               <FormControl>
                 <Input
-                  placeholder="Add a task..."
+                  placeholder="Add a new task..."
+                  className="task-input"
                   {...field}
                   disabled={mutation.isPending}
                 />
