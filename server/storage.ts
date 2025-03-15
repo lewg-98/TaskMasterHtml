@@ -1,10 +1,11 @@
-import { tasks, type Task, type InsertTask } from "@shared/schema";
+import { tasks, type Task, type InsertTask, type UpdateTask } from "@shared/schema";
 
 export interface IStorage {
   getTasks(): Promise<Task[]>;
   createTask(task: InsertTask): Promise<Task>;
-  updateTask(id: number, completed: boolean): Promise<Task | undefined>;
+  updateTask(id: number, task: Partial<UpdateTask>): Promise<Task | undefined>;
   deleteTask(id: number): Promise<boolean>;
+  clearCompletedTasks(): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -22,22 +23,35 @@ export class MemStorage implements IStorage {
 
   async createTask(insertTask: InsertTask): Promise<Task> {
     const id = this.currentId++;
-    const task: Task = { ...insertTask, id, completed: false };
+    const task: Task = {
+      ...insertTask,
+      id,
+      completed: false,
+      createdAt: new Date(),
+    };
     this.tasks.set(id, task);
     return task;
   }
 
-  async updateTask(id: number, completed: boolean): Promise<Task | undefined> {
+  async updateTask(id: number, updateData: Partial<UpdateTask>): Promise<Task | undefined> {
     const task = this.tasks.get(id);
     if (!task) return undefined;
-    
-    const updatedTask = { ...task, completed };
+
+    const updatedTask = { ...task, ...updateData };
     this.tasks.set(id, updatedTask);
     return updatedTask;
   }
 
   async deleteTask(id: number): Promise<boolean> {
     return this.tasks.delete(id);
+  }
+
+  async clearCompletedTasks(): Promise<void> {
+    for (const [id, task] of this.tasks.entries()) {
+      if (task.completed) {
+        this.tasks.delete(id);
+      }
+    }
   }
 }
 

@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertTaskSchema } from "@shared/schema";
+import { insertTaskSchema, updateTaskSchema } from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -26,12 +26,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(400).json({ message: "Invalid task ID" });
     }
 
-    const completed = z.boolean().safeParse(req.body.completed);
-    if (!completed.success) {
-      return res.status(400).json({ message: "Invalid completion status" });
+    const updateData = updateTaskSchema.partial().safeParse(req.body);
+    if (!updateData.success) {
+      return res.status(400).json({ message: "Invalid update data" });
     }
 
-    const task = await storage.updateTask(id, completed.data);
+    const task = await storage.updateTask(id, updateData.data);
     if (!task) {
       return res.status(404).json({ message: "Task not found" });
     }
@@ -50,6 +50,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(404).json({ message: "Task not found" });
     }
 
+    res.status(204).send();
+  });
+
+  app.post("/api/tasks/clear-completed", async (_req, res) => {
+    await storage.clearCompletedTasks();
     res.status(204).send();
   });
 
