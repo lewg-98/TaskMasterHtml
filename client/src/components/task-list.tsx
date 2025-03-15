@@ -5,6 +5,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { type Task } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
+import { saveTasks, loadTasks } from "@/lib/localStorage";
+import { useEffect } from "react";
 
 export function TaskList() {
   const { toast } = useToast();
@@ -12,7 +14,15 @@ export function TaskList() {
 
   const { data: tasks, isLoading } = useQuery<Task[]>({
     queryKey: ["/api/tasks"],
+    initialData: loadTasks, // Load initial data from localStorage
   });
+
+  // Save tasks to localStorage whenever they change
+  useEffect(() => {
+    if (tasks) {
+      saveTasks(tasks);
+    }
+  }, [tasks]);
 
   const toggleMutation = useMutation({
     mutationFn: async ({ id, completed }: { id: number; completed: boolean }) => {
@@ -25,7 +35,7 @@ export function TaskList() {
     onError: () => {
       toast({
         title: "Error",
-        description: "Failed to update task",
+        description: "Failed to update task status",
         variant: "destructive",
       });
     },
@@ -41,7 +51,7 @@ export function TaskList() {
     onError: () => {
       toast({
         title: "Error",
-        description: "Failed to delete task",
+        description: "Failed to remove task",
         variant: "destructive",
       });
     },
@@ -54,7 +64,7 @@ export function TaskList() {
   if (!tasks?.length) {
     return (
       <div className="text-center py-8 text-muted-foreground">
-        No tasks yet. Add your first task above!
+        No tasks yet. Create your first task above!
       </div>
     );
   }

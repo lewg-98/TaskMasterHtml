@@ -49,7 +49,7 @@ export function TaskForm() {
             <FormItem className="flex-1">
               <FormControl>
                 <Input
-                  placeholder="Add a new task..."
+                  placeholder="Create a new task..."
                   className="task-input"
                   {...field}
                   disabled={mutation.isPending}

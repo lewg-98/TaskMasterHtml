@@ -12,7 +12,7 @@ export default function Home() {
               Tasks
             </CardTitle>
             <p className="text-sm text-muted-foreground">
-              Manage your daily tasks and stay organized
+              Organise your daily tasks and stay on track
             </p>
           </CardHeader>
           <CardContent className="space-y-6">
